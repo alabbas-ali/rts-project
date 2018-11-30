@@ -30,22 +30,9 @@ void setup() {
   }
 
   // Now set up two Tasks to run independently.
-  xTaskCreate(
-    TaskDigitalRead
-    ,  (const portCHAR *)"DigitalRead"  // A name just for humans
-    ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
-    ,  NULL
-    ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,  NULL );
-
-  xTaskCreate(
-    TaskAnalogRead
-    ,  (const portCHAR *) "AnalogRead"
-    ,  128  // Stack size
-    ,  NULL
-    ,  1  // Priority
-    ,  NULL );
-
+  xTaskCreate(TaskDigitalRead, (const portCHAR *) "DigitalRead", 128, NULL, 2, NULL);
+  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+  xTaskCreate(TaskAnalogRead, (const portCHAR *) "AnalogRead", 128, NULL, 1, NULL);
   // Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
 }
 
@@ -58,12 +45,10 @@ void loop()
 /*---------------------- Tasks ---------------------*/
 /*--------------------------------------------------*/
 
-void TaskDigitalRead( void *pvParameters __attribute__((unused)) )  // This is a Task.
-{
+void TaskDigitalRead( void *pvParameters __attribute__((unused)) ) {
   /*
     DigitalReadSerial
     Reads a digital input on pin 2, prints the result to the serial monitor
-
     This example code is in the public domain.
   */
 
@@ -72,9 +57,7 @@ void TaskDigitalRead( void *pvParameters __attribute__((unused)) )  // This is a
 
   // make the pushbutton's pin an input:
   pinMode(pushButton, INPUT);
-
-  for (;;) // A Task shall never return or exit.
-  {
+  for (;;) {
     // read the input pin:
     int buttonState = digitalRead(pushButton);
 
@@ -87,35 +70,27 @@ void TaskDigitalRead( void *pvParameters __attribute__((unused)) )  // This is a
       // so we don't want it getting stolen during the middle of a conversion.
       // print out the state of the button:
       Serial.println(buttonState);
-
       xSemaphoreGive( xSerialSemaphore ); // Now free or "Give" the Serial Port for others.
     }
-
     vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
   }
 }
 
-void TaskAnalogRead( void *pvParameters __attribute__((unused)) )  // This is a Task.
-{
-
-  for (;;)
-  {
+void TaskAnalogRead( void *pvParameters __attribute__((unused)) ) {
+  for (;;) {
     // read the input on analog pin 0:
     int sensorValue = analogRead(A0);
 
     // See if we can obtain or "Take" the Serial Semaphore.
     // If the semaphore is not available, wait 5 ticks of the Scheduler to see if it becomes free.
-    if ( xSemaphoreTake( xSerialSemaphore, ( TickType_t ) 5 ) == pdTRUE )
-    {
+    if ( xSemaphoreTake( xSerialSemaphore, ( TickType_t ) 5 ) == pdTRUE ) {
       // We were able to obtain or "Take" the semaphore and can now access the shared resource.
       // We want to have the Serial Port for us alone, as it takes some time to print,
       // so we don't want it getting stolen during the middle of a conversion.
       // print out the value you read:
       Serial.println(sensorValue);
-
       xSemaphoreGive( xSerialSemaphore ); // Now free or "Give" the Serial Port for others.
     }
-
     vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
   }
 }
