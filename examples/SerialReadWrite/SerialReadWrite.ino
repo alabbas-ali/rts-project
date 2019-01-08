@@ -20,12 +20,21 @@ void setup() {
   // at 9600 bits per second:
   Serial.begin(9600);
 
+  while (!Serial) {
+    ; // wait for serial port to connect. 
+    // Needed for native USB, on LEONARDO, MICRO, YUN, and other 32u4 based boards.
+  }
+  
   // Semaphores are useful to stop a Task proceeding, where it should be paused to wait,
   // because it is sharing a resource, such as the Serial port.
   xSerialMutex = xSemaphoreCreateMutex();
     
   // Check to confirm that the Serial Semaphore has not already been created.
-  if ( xSerialMutex == NULL ) {
+  if ( xSerialMutex != NULL ) {
+
+    char const *t = "Application is ready";
+    Serial.println(t);
+    
     // Now set up two tasks to run independently.
     xTaskCreate(Task1, (const portCHAR *) "Blink", 128, NULL, 2, NULL);   
     // "Blink" A name just for humans
