@@ -1,5 +1,5 @@
 
-SemaphoreHandle_t lines[23][2];
+//SemaphoreHandle_t lines[23][2];
 
 int linesDelay[23];
 
@@ -34,18 +34,19 @@ int linesDelay[23];
 // 22     ||  14  -> 23     ||  1000      || lines[22][0] //  lines[22][1]
 
 void createLinesSemaphores(){
-  for(int i = 0; i < 23; i++){
-    if ( lines[i][0] == NULL ) {
-      lines[i][0] = xSemaphoreCreateBinary();  
-      if ( ( lines[i][0] ) != NULL )
-        xSemaphoreGive( ( lines[i][0] ) );  
-    }
-    if ( lines[i][1] == NULL ) {
-      lines[i][1] = xSemaphoreCreateBinary();
-      if ( ( lines[i][1] ) != NULL )
-        xSemaphoreGive( ( lines[i][1] ) );  
-    }
-  }
+//  for(int i = 0; i < 23; i++){
+//    if ( lines[i][0] == NULL ) {
+//      lines[i][0] = xSemaphoreCreateBinary();  
+//      if ( ( lines[i][0] ) != NULL )
+//        xSemaphoreGive( ( lines[i][0] ) );  
+//    }
+//    if ( lines[i][1] == NULL ) {
+//      lines[i][1] = xSemaphoreCreateBinary();
+//      if ( ( lines[i][1] ) != NULL )
+//        xSemaphoreGive( ( lines[i][1] ) );  
+//    }
+//  }
+
   linesDelay[0] = 1000;
   linesDelay[1] = 3000;
   linesDelay[2] = 3500;
@@ -70,5 +71,5 @@ void createLinesSemaphores(){
   linesDelay[21] = 1000;
   linesDelay[22] = 1000;
 
-  Serial.println(F("Lines Semaphores is Created"));
+  Serial.println("Lines Semaphores is Created");
 }

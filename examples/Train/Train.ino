@@ -1,6 +1,7 @@
-#include <Arduino_FreeRTOS.h>
-#include <semphr.h>
-#include <stdio.h>
+#include "Arduino_FreeRTOS.h"
+
+#include "semphr.h"
+#include "stdio.h"
 #include "Stations.h"
 #include "Lines.h"
 #include "Swiches.h"
@@ -25,7 +26,7 @@ void createSerialSemaphores(){
       xSemaphoreGive( ( xSerialSemaphore ) );  // Make the Serial Port available for use, by "Giving" the Semaphore.
   }
 
-  Serial.println("Serial Semaphore is Created");
+  Serial.println(F("Serial Semaphore is Created"));
 }
 
 // the setup function runs once when you press reset or power the board
@@ -39,7 +40,7 @@ void setup() {
     // Needed for native USB, on LEONARDO, MICRO, YUN, and other 32u4 based boards.
   }
 
-  Serial.println("Application is ready");
+  Serial.println(F("Application is ready"));
   
   // create application Semaphores
   createSerialSemaphores();
@@ -47,14 +48,14 @@ void setup() {
   createLinesSemaphores();
   createSwitchSemaphores();
 
-  Serial.println("Start Task Creation");
+  Serial.println(F("Start Task Creation"));
   
   // Now set up two tasks to run independently.
   xTaskCreate(Train1, (const portCHAR *) "Train 1", 128, NULL, 3, NULL);
   xTaskCreate(Train2, (const portCHAR *) "Train 2", 128, NULL, 2, NULL);
   xTaskCreate(Train3, (const portCHAR *) "Train 3", 128, NULL, 1, NULL);
 
-  Serial.println("Start Schedular");
+  Serial.println(F("Start Schedular"));
   
   // Start the scheduler so the created tasks start executing. */
   //vTaskStartScheduler();
@@ -74,537 +75,578 @@ void Train1(void *pvParameters) {
   int direction = 1;
   char printstring[100];
 
-  xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+  xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
   {   
-    Serial.println("Train 1 Start Runing");
+    Serial.println(F("Train 1 Start Runing"));
   }
   xSemaphoreGive(xSerialSemaphore);
    
   for (;;) {
 
-    vTaskDelay(1);
+    delay(1);
     
 	  direction = 1;
     // Going From 21 to 1 : Line: 0, 
-    xSemaphoreTake(lines[0][0], portMAX_DELAY);
+    xSemaphoreTake(lines[0][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i , 'direction': %i}" , "InterLine" , train_Numner, 21, 1, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
-      vTaskDelay(linesDelay[0]);
+      delay(linesDelay[0]);
     }
 
     // Entering station 1 direction 1 : Station: 0
-    xSemaphoreTake(stations[0][0], portMAX_DELAY);
+    xSemaphoreTake(stations[0][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 1, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	    xSemaphoreGive(lines[0][0]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 
     // Going From 1 to 2 :  Line: 1
-    xSemaphoreTake(lines[1][0], portMAX_DELAY);
+    xSemaphoreTake(lines[1][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 1, 2, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
 	  xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[0][0]);
-      vTaskDelay(linesDelay[1]);
+      delay(linesDelay[1]);
     }
 
     // Entering station 2 direction 1: Station: 1
-    xSemaphoreTake(stations[1][0], portMAX_DELAY);
+    xSemaphoreTake(stations[1][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 2, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[1][0]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
      
     // Going From 2 to 32:  Line: 2
-    xSemaphoreTake(lines[2][0], portMAX_DELAY);
+    xSemaphoreTake(lines[2][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 2, 32, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[1][0]);
-      vTaskDelay(linesDelay[2]);
+      delay(linesDelay[2]);
     }
 
     // Changing Switch 32 to state 1
-    xSemaphoreTake(switchs[0], portMAX_DELAY);
+    xSemaphoreTake(switchs[0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'witch': %i, 'direction': %i}" , "ChangeSwitch" , train_Numner, 32, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
-      vTaskDelay(switchDelay);
+      delay(switchDelay);
     }
 
     // Going From 32 to 3:  Line: 3
-    xSemaphoreTake(lines[3][0], portMAX_DELAY);
+    xSemaphoreTake(lines[3][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 32, 3, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[2][0]);
-      vTaskDelay(linesDelay[3]);
+      delay(linesDelay[3]);
     }
 
     // Entering station 3 direction 1: Station: 2
-    xSemaphoreTake(stations[2][0], portMAX_DELAY);
+    xSemaphoreTake(stations[2][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 3, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[3][0]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 
     // Going From 3 to 33:   Line: 4
-    xSemaphoreTake(lines[4][0], portMAX_DELAY);
+    xSemaphoreTake(lines[4][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 3, 33, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[2][0]);
-      vTaskDelay(linesDelay[4]);
+      delay(linesDelay[4]);
     }
 
     // Changing Switch 33 to state 1
-    xSemaphoreTake(switchs[1], portMAX_DELAY);
+    xSemaphoreTake(switchs[1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'witch': %i, 'direction': %i}" , "ChangeSwitch" , train_Numner, 33, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
-      vTaskDelay(switchDelay);
+      delay(switchDelay);
     }
 
     // Going From 33 to 4:   Line: 5
-    xSemaphoreTake(lines[5][0], portMAX_DELAY);
+    xSemaphoreTake(lines[5][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 33, 4, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[4][0]);
-      vTaskDelay(linesDelay[5]);
+      delay(linesDelay[5]);
     }
 
     // Entering station 4 direction 1 : Station: 3
-    xSemaphoreTake(stations[3][0], portMAX_DELAY);
+    xSemaphoreTake(stations[3][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 4, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[5][0]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 	
 	
 	// Going From 4 to 5 :  Line: 6
-    xSemaphoreTake(lines[6][0], portMAX_DELAY);
+    xSemaphoreTake(lines[6][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 4, 5, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[3][0]);
-      vTaskDelay(linesDelay[6]);
+      delay(linesDelay[6]);
     }
 	
 	// Entering station 5 direction 1 : Station: 4
-    xSemaphoreTake(stations[4][0], portMAX_DELAY);
+    xSemaphoreTake(stations[4][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 5, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[6][0]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 
     // Going From 5 to 34:  Line: 7
-    xSemaphoreTake(lines[7][0], portMAX_DELAY);
+    xSemaphoreTake(lines[7][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 5, 34, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[4][0]);
-      vTaskDelay(linesDelay[6]);
+      delay(linesDelay[6]);
     }
 
     // Changing Switch 34 to state 1
-    xSemaphoreTake(switchs[2], portMAX_DELAY);
+    xSemaphoreTake(switchs[2], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'witch': %i, 'direction': %i}" , "ChangeSwitch" , train_Numner, 34, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
-      vTaskDelay(switchDelay);
+      delay(switchDelay);
     }
 
     // Going From 34 to 6 : Line: 8
-    xSemaphoreTake(lines[8][0], portMAX_DELAY);
+    xSemaphoreTake(lines[8][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 34, 6, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[7][0]);
-      vTaskDelay(linesDelay[8]);
+      delay(linesDelay[8]);
     }
 
     // Entering station 6 direction 1
-    xSemaphoreTake(stations[5][0], portMAX_DELAY);
+    xSemaphoreTake(stations[5][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 6, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[8][0]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 
     // Going From 6 to 7: Line: 9
-    xSemaphoreTake(lines[9][0], portMAX_DELAY);
+    xSemaphoreTake(lines[9][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 6, 7, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[5][0]);
-      vTaskDelay(linesDelay[9]);
+      delay(linesDelay[9]);
     }
 
     // Entering station 7 direction 1
-    xSemaphoreTake(stations[6][0], portMAX_DELAY);
+    xSemaphoreTake(stations[6][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 7, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[9][0]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 
     // Going From 7 to 25 L Line : 10
-    xSemaphoreTake(lines[10][0], portMAX_DELAY);
+    xSemaphoreTake(lines[10][0], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 7, 25, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[6][0]);
-      vTaskDelay(linesDelay[10]);
+      delay(linesDelay[10]);
     }
 	
 	direction = 2;
 	
-	xSemaphoreTake(lines[10][1], portMAX_DELAY);
+	xSemaphoreTake(lines[10][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 25, 7, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
-      vTaskDelay(linesDelay[10]);
+      delay(linesDelay[10]);
     }
 	
-	xSemaphoreTake(stations[6][1], portMAX_DELAY);
+	xSemaphoreTake(stations[6][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 7, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[10][1]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 	
-	xSemaphoreTake(lines[9][1], portMAX_DELAY);
+	xSemaphoreTake(lines[9][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 7, 6, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[6][1]);
-      vTaskDelay(linesDelay[9]);
+      delay(linesDelay[9]);
     }
 	
-	xSemaphoreTake(stations[5][1], portMAX_DELAY);
+	xSemaphoreTake(stations[5][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 6, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[9][1]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 	
-	xSemaphoreTake(lines[8][1], portMAX_DELAY);
+	xSemaphoreTake(lines[8][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 6, 35, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[5][1]);
-      vTaskDelay(linesDelay[8]);
+      delay(linesDelay[8]);
     }
 	
 	// Changing Switch 34 to state 1
-    xSemaphoreTake(switchs[3], portMAX_DELAY);
+    xSemaphoreTake(switchs[3], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'witch': %i, 'direction': %i}" , "ChangeSwitch" , train_Numner, 35, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
-      vTaskDelay(switchDelay);
+      delay(switchDelay);
     }
 	
-	xSemaphoreTake(lines[7][1], portMAX_DELAY);
+	xSemaphoreTake(lines[7][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 35, 5, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[8][1]);
-      vTaskDelay(linesDelay[7]);
+      delay(linesDelay[7]);
     }
 	
-	xSemaphoreTake(stations[4][1], portMAX_DELAY);
+	xSemaphoreTake(stations[4][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 5, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[7][1]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 	
-	xSemaphoreTake(lines[6][1], portMAX_DELAY);
+	xSemaphoreTake(lines[6][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 5, 4, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[4][1]);
-      vTaskDelay(linesDelay[6]);
+      delay(linesDelay[6]);
     }
 	
-	xSemaphoreTake(stations[3][1], portMAX_DELAY);
+	xSemaphoreTake(stations[3][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 4, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[6][1]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 	
-	xSemaphoreTake(lines[5][1], portMAX_DELAY);
+	xSemaphoreTake(lines[5][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 4, 36, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[3][1]);
-      vTaskDelay(linesDelay[5]);
+      delay(linesDelay[5]);
     }
 	
-    xSemaphoreTake(switchs[4], portMAX_DELAY);
+    xSemaphoreTake(switchs[4], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'witch': %i, 'direction': %i}" , "ChangeSwitch" , train_Numner, 36, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
-      vTaskDelay(switchDelay);
+      delay(switchDelay);
     }
 	
-	xSemaphoreTake(lines[4][1], portMAX_DELAY);
+	xSemaphoreTake(lines[4][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 36, 3, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[5][1]);
-      vTaskDelay(linesDelay[4]);
+      delay(linesDelay[4]);
     }
 	
-	xSemaphoreTake(stations[2][1], portMAX_DELAY);
+	xSemaphoreTake(stations[2][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 3, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[4][1]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 	
-	xSemaphoreTake(lines[3][1], portMAX_DELAY);
+	xSemaphoreTake(lines[3][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 3, 37, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[2][1]);
-      vTaskDelay(linesDelay[3]);
+      delay(linesDelay[3]);
     }
 	
-	
-	xSemaphoreTake(switchs[5], portMAX_DELAY);
+	xSemaphoreTake(switchs[5], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'witch': %i, 'direction': %i}" , "ChangeSwitch" , train_Numner, 37, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
-      vTaskDelay(switchDelay);
+      delay(switchDelay);
     }
 	
-	xSemaphoreTake(lines[2][1], portMAX_DELAY);
+	xSemaphoreTake(lines[2][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 37, 2, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[3][1]);
-      vTaskDelay(linesDelay[2]);
+      delay(linesDelay[2]);
     }
 	
-	xSemaphoreTake(stations[1][1], portMAX_DELAY);
+	xSemaphoreTake(stations[1][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 2, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[2][1]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 	
-	xSemaphoreTake(lines[1][1], portMAX_DELAY);
+	xSemaphoreTake(lines[1][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 2, 1, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[1][1]);
-      vTaskDelay(linesDelay[1]);
+      delay(linesDelay[1]);
     }
 	
-	xSemaphoreTake(stations[0][1], portMAX_DELAY);
+	xSemaphoreTake(stations[0][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'station': %i, 'direction': %i}" , "InterStation" , train_Numner, 1, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(lines[1][1]);
-      vTaskDelay(stationDelay);
+      delay(stationDelay);
     }
 	
-	xSemaphoreTake(lines[0][1], portMAX_DELAY);
+	xSemaphoreTake(lines[0][1], ( TickType_t ) 1000);
     {
-      xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+      xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
       {
         sprintf(printstring, "{'command': %s, 'train': %i, 'from': %i, 'to': %i, 'direction': %i}" , "InterLine" , train_Numner, 1, 21, direction);
         Serial.println(printstring);
+        Serial.flush();
       }
       xSemaphoreGive(xSerialSemaphore);
 	  xSemaphoreGive(stations[0][1]);
-      vTaskDelay(linesDelay[0]);
+      delay(linesDelay[0]);
     }
   }
 }
@@ -616,15 +658,15 @@ void Train2(void *pvParameters) {
   (void) pvParameters;
   char const *Train1Name = "Train 2";
 
-  xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+  xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
   {   
     Serial.println("Train 2 Start Runing");
   }
   xSemaphoreGive(xSerialSemaphore);
   
   for (;;) {
-    vTaskDelay(2000);
-    xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+    delay(2000);
+    xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
     {
       Serial.println( Train1Name );
     }
@@ -632,21 +674,18 @@ void Train2(void *pvParameters) {
   }
 }
 
-
-
-
 void Train3(void *pvParameters) {
   (void) pvParameters;
   char const *Train1Name = "Train 3";
 
-  xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+  xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
   {   
     Serial.println("Train 3 Start Runing");
   }
   xSemaphoreGive(xSerialSemaphore);
   for (;;) {
-    vTaskDelay(2000);
-    xSemaphoreTake(xSerialSemaphore, portMAX_DELAY);
+    delay(2000);
+    xSemaphoreTake(xSerialSemaphore, ( TickType_t ) 1000);
     {
       Serial.println( Train1Name );
     }
@@ -676,6 +715,6 @@ void Train3(void *pvParameters) {
 //      }
 //      xSemaphoreGive( xSerialSemaphore );
 //    }
-//    vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+//    delay(1);  // one tick delay (15ms) in between reads for stability
 //  }
 //}

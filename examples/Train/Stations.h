@@ -17,5 +17,5 @@ void createStationSemaphores(){
         xSemaphoreGive( ( stations[i][1] ) );  
     } 
   }
-  Serial.println("Station Semaphores is Created");
+  Serial.println(F("Station Semaphores is Created"));
 }
