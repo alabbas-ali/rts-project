@@ -12,5 +12,5 @@ void createSwitchSemaphores(){
     }
   }
 
-  Serial.println("Switch Semaphores is Created");
+  Serial.println(F("Switch Semaphores is Created"));
 }

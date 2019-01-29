@@ -70,5 +70,5 @@ void createLinesSemaphores(){
   linesDelay[21] = 1000;
   linesDelay[22] = 1000;
 
-  Serial.println("Lines Semaphores is Created");
+  Serial.println(F("Lines Semaphores is Created"));
 }
