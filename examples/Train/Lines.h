@@ -1,13 +1,14 @@
+#include <stdlib.h>
 
 SemaphoreHandle_t lines[23][2];
 
 int linesDelay[23];
 
-// Time is a scaled of the real word time be each 1 min to 1 second 
-// This is the minimum time any train required to base on the line 
-// This time could be extended in case the next resource required 
+// Time is a scaled of the real word time be each 1 min to 1 second
+// This is the minimum time any train required to base on the line
+// This time could be extended in case the next resource required
 // to release the line is used .
-// 
+//
 // Line # ||  From -> To    ||  Time (ms) ||
 // 0      ||  21 -> 1       ||  1000      || lines[0][0] //  lines[0][1]
 // 1      ||  1  -> 2       ||  3000      || lines[1][0] //  lines[1][1]
@@ -29,46 +30,46 @@ int linesDelay[23];
 // 17     ||  32/37  -> 12  ||  4000      || lines[17][0] //  lines[17][1]
 // 18     ||  12  -> 31/38  ||  500       || lines[18][0] //  lines[18][1]
 // 19     ||  31/38  -> 13  ||  2500      || lines[19][0] //  lines[19][1]
-// 20     ||  31/38  -> 14  ||  3000      || lines[20][0] //  lines[20][1]
-// 21     ||  13  -> 22     ||  1000      || lines[21][0] //  lines[21][1]
+// 20     ||  31/38  -> 14  ||  3000      || lines[21][0] //  lines[20][1]
+// 21     ||  13  -> 22     ||  1000      || lines[20][0] //  lines[21][1]
 // 22     ||  14  -> 23     ||  1000      || lines[22][0] //  lines[22][1]
 
-void createLinesSemaphores(){
-  for(int i = 0; i < 23; i++){
+void createLinesSemaphores() {
+  for (int i = 0; i < 23; i++) {
     if ( lines[i][0] == NULL ) {
-      lines[i][0] = xSemaphoreCreateBinary();  
+      lines[i][0] = xSemaphoreCreateBinary();
       if ( ( lines[i][0] ) != NULL )
-        xSemaphoreGive( ( lines[i][0] ) );  
+        xSemaphoreGive( ( lines[i][0] ) );
     }
     if ( lines[i][1] == NULL ) {
       lines[i][1] = xSemaphoreCreateBinary();
       if ( ( lines[i][1] ) != NULL )
-        xSemaphoreGive( ( lines[i][1] ) );  
+        xSemaphoreGive( ( lines[i][1] ) );
     }
   }
-  linesDelay[0] = 1000;
-  linesDelay[1] = 3000;
-  linesDelay[2] = 3500;
-  linesDelay[3] = 500;
-  linesDelay[4] = 2500;
-  linesDelay[5] = 500;
-  linesDelay[6] = 2500;
-  linesDelay[7] = 500;
-  linesDelay[8] = 3500;
-  linesDelay[9] = 3000;
-  linesDelay[10] = 4000;
-  linesDelay[11] = 1000;
-  linesDelay[12] = 3000;
-  linesDelay[13] = 1000;
-  linesDelay[14] = 3500;
-  linesDelay[15] = 5000;
-  linesDelay[16] = 1000;
-  linesDelay[17] = 4000;
-  linesDelay[18] = 500;
-  linesDelay[19] = 2500;
-  linesDelay[20] = 3000;
-  linesDelay[21] = 1000;
-  linesDelay[22] = 1000;
+  linesDelay[0] = 1000 + (rand() % 500);
+  linesDelay[1] = 3000 + (rand() % 1500);
+  linesDelay[2] = 3500 + (rand() % 1750);
+  linesDelay[3] = 500 + (rand() % 250);
+  linesDelay[4] = 2500 + (rand() % 1250);
+  linesDelay[5] = 500 + (rand() % 250);
+  linesDelay[6] = 2500 + (rand() % 1250);
+  linesDelay[7] = 500 + (rand() % 250);
+  linesDelay[8] = 3500 + (rand() % 1750);
+  linesDelay[9] = 3000 + (rand() % 1500);
+  linesDelay[10] = 4000 + (rand() % 2000);
+  linesDelay[11] = 1000 + (rand() % 500);
+  linesDelay[12] = 3000 + (rand() % 1500);
+  linesDelay[13] = 1000 + (rand() % 500);
+  linesDelay[14] = 3500 + (rand() % 1750);
+  linesDelay[15] = 5000 + (rand() % 2500);
+  linesDelay[16] = 1000 + (rand() % 500);
+  linesDelay[17] = 4000 + (rand() % 2000);
+  linesDelay[18] = 500 + (rand() % 250);
+  linesDelay[19] = 2500 + (rand() % 1250);
+  linesDelay[20] = 1000 + (rand() % 500);
+  linesDelay[21] = 3000 + (rand() % 1500);
+  linesDelay[22] = 1000 + (rand() % 500);
 
   Serial.println(F("Lines Semaphores is Created"));
 }
