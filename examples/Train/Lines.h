@@ -25,7 +25,7 @@ int linesDelay[23];
 // 12     ||  8  -> 9       ||  3000      || lines[12][0] //  lines[12][1]
 // 13     ||  9  -> 26      ||  1000      || lines[13][0] //  lines[13][1]
 // 14     ||  33/36  -> 10  ||  3500      || lines[14][0] //  lines[14][1]
-// 15     ||  10  -> 11     ||  5000      || lines[15][0] //  lines[15][1]
+// 15     ||  10  -> 11     ||  3000      || lines[15][0] //  lines[15][1]
 // 16     ||  11  -> 24     ||  1000      || lines[16][0] //  lines[16][1]
 // 17     ||  32/37  -> 12  ||  4000      || lines[17][0] //  lines[17][1]
 // 18     ||  12  -> 31/38  ||  500       || lines[18][0] //  lines[18][1]
@@ -37,39 +37,39 @@ int linesDelay[23];
 void createLinesSemaphores() {
   for (int i = 0; i < 23; i++) {
     if ( lines[i][0] == NULL ) {
-      lines[i][0] = xSemaphoreCreateBinary();
+      lines[i][0] = xSemaphoreCreateMutex();
       if ( ( lines[i][0] ) != NULL )
         xSemaphoreGive( ( lines[i][0] ) );
     }
     if ( lines[i][1] == NULL ) {
-      lines[i][1] = xSemaphoreCreateBinary();
+      lines[i][1] = xSemaphoreCreateMutex();
       if ( ( lines[i][1] ) != NULL )
         xSemaphoreGive( ( lines[i][1] ) );
     }
   }
-  linesDelay[0] = 1000 + (rand() % 500);
-  linesDelay[1] = 3000 + (rand() % 1500);
-  linesDelay[2] = 3500 + (rand() % 1750);
-  linesDelay[3] = 500 + (rand() % 250);
-  linesDelay[4] = 2500 + (rand() % 1250);
-  linesDelay[5] = 500 + (rand() % 250);
-  linesDelay[6] = 2500 + (rand() % 1250);
-  linesDelay[7] = 500 + (rand() % 250);
-  linesDelay[8] = 3500 + (rand() % 1750);
-  linesDelay[9] = 3000 + (rand() % 1500);
-  linesDelay[10] = 4000 + (rand() % 2000);
-  linesDelay[11] = 1000 + (rand() % 500);
-  linesDelay[12] = 3000 + (rand() % 1500);
-  linesDelay[13] = 1000 + (rand() % 500);
-  linesDelay[14] = 3500 + (rand() % 1750);
-  linesDelay[15] = 5000 + (rand() % 2500);
-  linesDelay[16] = 1000 + (rand() % 500);
-  linesDelay[17] = 4000 + (rand() % 2000);
-  linesDelay[18] = 500 + (rand() % 250);
-  linesDelay[19] = 2500 + (rand() % 1250);
-  linesDelay[20] = 1000 + (rand() % 500);
-  linesDelay[21] = 3000 + (rand() % 1500);
-  linesDelay[22] = 1000 + (rand() % 500);
+  linesDelay[0] = 500;
+  linesDelay[1] = 1500;
+  linesDelay[2] = 1750;
+  linesDelay[3] = 250;
+  linesDelay[4] = 1250;
+  linesDelay[5] = 250;
+  linesDelay[6] = 1250;
+  linesDelay[7] = 250;
+  linesDelay[8] = 1750;
+  linesDelay[9] = 1500;
+  linesDelay[10] = 2000;
+  linesDelay[11] = 500;
+  linesDelay[12] = 1500;
+  linesDelay[13] = 500;
+  linesDelay[14] = 1750;
+  linesDelay[15] = 1500;
+  linesDelay[16] = 500;
+  linesDelay[17] = 2000;
+  linesDelay[18] = 250;
+  linesDelay[19] = 1250;
+  linesDelay[20] = 500;
+  linesDelay[21] = 1500;
+  linesDelay[22] = 500;
 
-  Serial.println(F("Lines Semaphores is Created"));
+  // Serial.println(F("Lines Semaphores is Created"));
 }
